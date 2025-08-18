@@ -139,3 +139,60 @@ module ula (a,b,x,y,z,s);
         .sel0(x), .sel1(y), .sel2(z), .op(s)
     );
 endmodule
+
+
+## TestBench
+    `timescale 1ns/1ps
+
+module tb_ula;
+
+    reg [3:0] a, b;
+    reg x, y, z;
+    wire [3:0] s;
+
+    // Instancia a ULA
+    ula dut (
+        .a(a),
+        .b(b),
+        .x(x),
+        .y(y),
+        .z(z),
+        .s(s)
+    );
+
+    initial begin
+        // arquivo de dump para GTKWave
+        $dumpfile("ula_tb.vcd");
+        $dumpvars(0, tb_ula);
+
+        // valores de entrada fixos
+        a = 4'b1010; // 10 decimal
+        b = 4'b0011; // 3 decimal
+
+        // header para console
+        $display("Time | sel zyx | a    | b    | s");
+        $display("------------------------------------");
+        $monitor("%4t |  %b%b%b   | %b | %b | %b", 
+                  $time, z, y, x, a, b, s);
+
+        // percorre as 8 combinações de seleção
+        {z,y,x} = 3'b000; #10;  // soma
+        {z,y,x} = 3'b001; #10;  // subtração
+        {z,y,x} = 3'b010; #10;  // shift left
+        {z,y,x} = 3'b011; #10;  // shift right
+        {z,y,x} = 3'b100; #10;  // AND
+        {z,y,x} = 3'b101; #10;  // OR
+        {z,y,x} = 3'b110; #10;  // XOR
+        {z,y,x} = 3'b111; #10;  // NOT a
+
+        $finish;
+    end
+
+    endmodule
+
+## RTL viewer
+  [image]
+
+## Results
+
+[image]
