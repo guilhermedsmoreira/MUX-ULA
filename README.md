@@ -59,7 +59,7 @@ The logic follows the truth table shown below:
     endmodule
 
 ## RTL viewer
-  [image]
+ ![RTL_Viewer](mux8x1_4b_rtl.png)
 
 ## Testbench
 
@@ -153,12 +153,12 @@ Note: The same process of verification (testbench, simulation in GTKWave, and RT
 ## Results
 The results were verified through simulation with GTKWave.  
 
-[gtkwave_mux]
+ ![GTK_wave_MUX](GTKwave_MUX.png)
 
 By analyzing the simulation in GTKWave, we can verify the correct behavior of the multiplexer.
 For example, when the select inputs are set to sel2=0, sel1=0, sel0=1, the output is op=4, which matches the expected truth table and the Verilog description of the MUX.
 
-[gtkwave_alu]
+ ![GTK_wave_ALU](GTKwave_ALU.png)
 
 By analyzing the ALU simulation in GTKWave, we can confirm the expected behavior.
 For instance, when the select inputs are set to x=0, y=0, z=0, the output is s=13.
