@@ -1,4 +1,4 @@
-# MUX-ULA  
+# MUX-ALU  
 8x1 Multiplexer and Arithmetic Logic Unit (ALU) implemented in Verilog, with testbench and simulation.  
 
 The project is divided into two main parts:  
@@ -98,14 +98,10 @@ The logic follows the truth table shown below:
     end
     endmodule
 
-## Results
-The results were verified through simulation with GTKWave.  
-The waveform below shows the correct behavior for all ALU operations, selected by the control inputs (`x,y,z`).
 
-![GTKWave Results](images/gtk_ula_results.png)
 
-## ULA  
-The ULA was described in Verilog with:  
+## ALU
+The ALU was described in Verilog with:  
 
 - **Two 4-bit inputs:** `a`, `b`  
 - **Three selection inputs:** `x`, `y`, `z`  
@@ -126,29 +122,45 @@ The wires are connected to the inputs of the multiplexer (`mux8x1_4b`), which se
 | d7   | ~a         |
 
 ### Verilog description
-```verilog
-module ula (a,b,x,y,z,s);
-    input [3:0] a, b;
-    input x, y, z;
-    output [3:0] s;
 
-    wire [3:0] d0,d1,d2,d3,d4,d5,d6,d7;
+    module ula (a,b,x,y,z,s);
+        input [3:0] a, b;
+        input x, y, z;
+        output [3:0] s;
+    
+        wire [3:0] d0,d1,d2,d3,d4,d5,d6,d7;
+    
+        assign d0 = a + b;
+        assign d1 = a - b;
+        assign d2 = a << b;
+        assign d3 = a >> b;
+        assign d4 = a & b;
+        assign d5 = a | b;
+        assign d6 = a ^ b;
+        assign d7 = ~a;
+    
+        mux8x1_4b muxout(
+            .f0(d0), .f1(d1), .f2(d2), .f3(d3),
+            .f4(d4), .f5(d5), .f6(d6), .f7(d7),
+            .sel0(x), .sel1(y), .sel2(z), .op(s)
+        );
+    endmodule
 
-    assign d0 = a + b;
-    assign d1 = a - b;
-    assign d2 = a << b;
-    assign d3 = a >> b;
-    assign d4 = a & b;
-    assign d5 = a | b;
-    assign d6 = a ^ b;
-    assign d7 = ~a;
 
-    mux8x1_4b muxout(
-        .f0(d0), .f1(d1), .f2(d2), .f3(d3),
-        .f4(d4), .f5(d5), .f6(d6), .f7(d7),
-        .sel0(x), .sel1(y), .sel2(z), .op(s)
-    );
-endmodule
+Note: The same process of verification (testbench, simulation in GTKWave, and RTL viewer) was applied to the ALU as for the MUX, but only the MUX results are included here for brevity.
 
 
-Note: The same process of verification (testbench, simulation in GTKWave, and RTL viewer) was applied to the ULA as for the MUX, but only the MUX results are included here for brevity.
+## Results
+The results were verified through simulation with GTKWave.  
+
+[gtkwave_mux]
+
+By analyzing the simulation in GTKWave, we can verify the correct behavior of the multiplexer.
+For example, when the select inputs are set to sel2=0, sel1=0, sel0=1, the output is op=4, which matches the expected truth table and the Verilog description of the MUX.
+
+[gtkwave_alu]
+
+By analyzing the ALU simulation in GTKWave, we can confirm the expected behavior.
+For instance, when the select inputs are set to x=0, y=0, z=0, the output is s=13.
+This result follows from the inputs a=10 and b=3, with the selected operation being addition.
+The outcome is consistent with the truth table and the Verilog description of the ALU.
