@@ -1,5 +1,14 @@
 # MUX-ULA  
-8x1 Multiplexer and ALU implemented in Verilog, with testbench and simulation.
+8x1 Multiplexer and Arithmetic Logic Unit (ALU) implemented in Verilog, with testbench and simulation.  
+
+The project is divided into two main parts:  
+
+1. **MUX 8x1 (4-bit)** → Selects one of eight 4-bit inputs based on 3 control signals.  
+2. **ULA (ALU)** → Implements 8 arithmetic/logic operations. The result of each operation is sent to the MUX, which chooses the final output according to the control signals (`x, y, z`).  
+
+This structure allows the ALU to reuse the multiplexer for operation selection.  
+
+---
 
 ## MUX  
 The MUX was described in Verilog with:  
@@ -8,19 +17,18 @@ The MUX was described in Verilog with:
 - **Three selection inputs:** `sel0`, `sel1`, `sel2`  
 - **One 4-bit output:** `op`  
 
-For each bit of `op`, a Boolean expression was assigned based on the selection inputs.  
 The logic follows the truth table shown below:  
 
 | x | y | z | Output (`op`) |
-|------|------|------|---------------|
-|  0   |  0   |  0   | f0            |
-|  0   |  0   |  1   | f1            |
-|  0   |  1   |  0   | f2            |
-|  0   |  1   |  1   | f3            |
-|  1   |  0   |  0   | f4            |
-|  1   |  0   |  1   | f5            |
-|  1   |  1   |  0   | f6            |
-|  1   |  1   |  1   | f7            |
+|---|---|---|---------------|
+| 0 | 0 | 0 | f0 |
+| 0 | 0 | 1 | f1 |
+| 0 | 1 | 0 | f2 |
+| 0 | 1 | 1 | f3 |
+| 1 | 0 | 0 | f4 |
+| 1 | 0 | 1 | f5 |
+| 1 | 1 | 0 | f6 |
+| 1 | 1 | 1 | f7 |
 
 ### Verilog description
     module mux8x1_4b (f0, f1, f2, f3, f4, f5, f6, f7, sel0, sel1, sel2, op);
@@ -91,8 +99,10 @@ The logic follows the truth table shown below:
     endmodule
 
 ## Results
+The results were verified through simulation with GTKWave.  
+The waveform below shows the correct behavior for all ALU operations, selected by the control inputs (`x,y,z`).
 
-[image]
+![GTKWave Results](images/gtk_ula_results.png)
 
 ## ULA  
 The ULA was described in Verilog with:  
@@ -141,58 +151,4 @@ module ula (a,b,x,y,z,s);
 endmodule
 
 
-## TestBench
-    `timescale 1ns/1ps
-
-module tb_ula;
-
-    reg [3:0] a, b;
-    reg x, y, z;
-    wire [3:0] s;
-
-    // Instancia a ULA
-    ula dut (
-        .a(a),
-        .b(b),
-        .x(x),
-        .y(y),
-        .z(z),
-        .s(s)
-    );
-
-    initial begin
-        // arquivo de dump para GTKWave
-        $dumpfile("ula_tb.vcd");
-        $dumpvars(0, tb_ula);
-
-        // valores de entrada fixos
-        a = 4'b1010; // 10 decimal
-        b = 4'b0011; // 3 decimal
-
-        // header para console
-        $display("Time | sel zyx | a    | b    | s");
-        $display("------------------------------------");
-        $monitor("%4t |  %b%b%b   | %b | %b | %b", 
-                  $time, z, y, x, a, b, s);
-
-        // percorre as 8 combinações de seleção
-        {z,y,x} = 3'b000; #10;  // soma
-        {z,y,x} = 3'b001; #10;  // subtração
-        {z,y,x} = 3'b010; #10;  // shift left
-        {z,y,x} = 3'b011; #10;  // shift right
-        {z,y,x} = 3'b100; #10;  // AND
-        {z,y,x} = 3'b101; #10;  // OR
-        {z,y,x} = 3'b110; #10;  // XOR
-        {z,y,x} = 3'b111; #10;  // NOT a
-
-        $finish;
-    end
-
-    endmodule
-
-## RTL viewer
-  [image]
-
-## Results
-
-[image]
+Note: The same process of verification (testbench, simulation in GTKWave, and RTL viewer) was applied to the ULA as for the MUX, but only the MUX results are included here for brevity.
